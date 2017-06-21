@@ -178,8 +178,10 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
           orderBy = " ORDER BY " + entry.getValue() + " DESC";
           break;
         default:
-          where = ("".equals(where)) ? " WHERE " : " AND ";
-          where += entry.getKey() + " = " + entry.getKey();
+          for (String condition : entry.getValue()) {
+            where = ("".equals(where)) ? " WHERE " : " AND ";
+            where += entry.getKey() + " = '" + condition + "'";
+          }
       }
     }
 
