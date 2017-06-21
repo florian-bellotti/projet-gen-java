@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+    <jaxrs:server id="remoteContainer" address="/services">
+        <jaxrs:serviceBeans>
+            <ref bean="dictionaryService" />
+            <ref bean="decodedFileService" />
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+                <property name="convertTypesToStrings" value="true"/>
+                <property name="serializeAsArray" value="true"/>
+                <property name="arrayKeys">
+                    <list>
+                        <value>word</value>
+                    </list>
+                </property>
+            </bean>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="${db.url}" />
+        <property name="username" value="${db.user}" />
+        <property name="password" value="${db.pwd}" />
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="200" />
+        <property name="maxIdle" value="5" />
+        <property name="minIdle" value="2" />
+        <property name="removeAbandoned" value="true"/>
+        <property name="removeAbandonedTimeout" value="45"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="validationQuery" value="SELECT 1"/>
+    </bean>
+
+    <bean id="dictionaryDao" class="com.fbellotti.gen.dao.DictionaryDao">
+        <constructor-arg name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="decodedFileDao" class="com.fbellotti.gen.dao.DecodedFileDao">
+        <constructor-arg name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="dictionaryService" class="com.fbellotti.gen.remote.dictionary.DictionaryServiceImpl">
+        <constructor-arg name="crudDao" ref="dictionaryDao" />
+        <constructor-arg name="dictionaryDao" ref="dictionaryDao" />
+    </bean>
+
+    <bean id="decodedFileService" class="com.fbellotti.gen.remote.decodedFile.DecodedFileServiceImpl">
+        <constructor-arg name="daoRef" ref="decodedFileDao" />
+    </bean>
+</beans>
