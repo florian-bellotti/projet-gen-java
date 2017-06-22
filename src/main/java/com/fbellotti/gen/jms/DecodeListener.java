@@ -1,7 +1,6 @@
 package com.fbellotti.gen.jms;
 
 import com.fbellotti.gen.dao.DecodedFileDao;
-import com.fbellotti.gen.dao.DictionaryDao;
 import com.fbellotti.gen.model.DecodedFile;
 import com.fbellotti.gen.model.Words;
 import org.slf4j.Logger;
@@ -24,16 +23,14 @@ public class DecodeListener implements MessageListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(DecodeListener.class);
 
-  private DictionaryDao daoDictionary;
   private DecodedFileDao daoDecodedFile;
   private float minFiability;
   private JmsProducer jmsProducer;
   private Words words;
 
-  public DecodeListener(DictionaryDao daoDictionary, DecodedFileDao daoDecodedFile,
-                        float minFiability, JmsProducer jmsProducer, Words words) {
+  public DecodeListener(DecodedFileDao daoDecodedFile, float minFiability,
+                        JmsProducer jmsProducer, Words words) {
     super();
-    this.daoDictionary = daoDictionary;
     this.daoDecodedFile = daoDecodedFile;
     this.minFiability = minFiability;
     this.jmsProducer = jmsProducer;
@@ -85,9 +82,11 @@ public class DecodeListener implements MessageListener {
           decodedFile.setSecret(secret);
         }
 
-        LOG.info("File " + fileName + " was decoded with key " + key);
-        jmsProducer.produce(key, fileName);
-        daoDecodedFile.create(decodedFile);
+        if (!daoDecodedFile.isAlreadyExist(fileName, wordsTab[0])) {
+          LOG.info("File " + fileName + " was decoded with key " + key);
+          jmsProducer.produce(key, fileName, key, secret);
+          daoDecodedFile.create(decodedFile);
+        }
       }
       System.out.println(Thread.currentThread().getName() + " ratio : " + ratio);
     } catch (JMSException e) {

@@ -189,4 +189,39 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
     fields = count ? "(" + fields + ")" : fields;
     return "SELECT " + fields + " FROM decodedFile " + where + orderBy;
   }
+
+  public Boolean isAlreadyExist(String fileName, String firstWord) {
+    String sql =
+      "SELECT distinct fileName, firstWord FROM decodedFile " +
+      "WHERE fileName = ? AND firstWord = ?";
+    Connection conn = null;
+    Boolean exist = false;
+
+    try {
+      conn = dataSource.getConnection();
+
+      // prepare the query & execute
+      PreparedStatement ps = conn.prepareStatement(sql);
+      ps.setString(1, fileName);
+      ps.setString(2, firstWord);
+      ResultSet rs = ps.executeQuery();
+      exist = (rs.next()) ? true : false;
+
+      // close
+      rs.close();
+      ps.close();
+
+      return exist;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+  }
 }

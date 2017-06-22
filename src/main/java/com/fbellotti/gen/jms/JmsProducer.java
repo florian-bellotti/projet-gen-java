@@ -31,10 +31,12 @@ public class JmsProducer {
     }
   }
 
-  public void produce(String message, String fileName) {
+  public void produce(String message, String fileName, String key, String secret) {
     try {
       TextMessage msg = session.createTextMessage();
       msg.setStringProperty("fileName", fileName);
+      msg.setStringProperty("key", key);
+      msg.setStringProperty("secret", secret);
       msg.setText(message);
       producer.send(msg);
     } catch (JMSException e) {

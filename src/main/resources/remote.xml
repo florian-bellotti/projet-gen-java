@@ -46,7 +46,6 @@
         <constructor-arg name="url" value="${jms.url}" />
         <constructor-arg name="listenerQueue" value="${jms.listenerQueue}" />
         <constructor-arg name="listenerNb" value="${jms.listenerNb}" />
-        <constructor-arg name="daoDictionary" ref="dictionaryDao" />
         <constructor-arg name="daoDecodedFile" ref="decodedFileDao" />
         <constructor-arg name="minFiability" value="${jms.minFiability}" />
         <constructor-arg name="jmsProducer" ref="jmsProducer" />
