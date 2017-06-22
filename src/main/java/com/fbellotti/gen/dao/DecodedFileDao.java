@@ -34,10 +34,10 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
       // prepare the query
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
       ps.setString(1, decodedFile.getFileName());
-      ps.setString(1, decodedFile.getDecodeKey());
-      ps.setString(1, decodedFile.getMd5());
-      ps.setString(1, decodedFile.getFirstWorld());
-      ps.setString(1, decodedFile.getSecret());
+      ps.setString(2, decodedFile.getDecodeKey());
+      ps.setString(3, decodedFile.getMd5());
+      ps.setString(4, decodedFile.getFirstWorld());
+      ps.setString(5, decodedFile.getSecret());
 
       // execute the query
       ps.executeUpdate();

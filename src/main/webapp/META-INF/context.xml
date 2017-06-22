@@ -1,2 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" swallowOutput="true" path="/gen-java"/>
+<Context antiJARLocking="true" swallowOutput="true" path="/gen-java">
+
+<Resource name="jms/mqConnectionFactory"
+          auth="Container"
+          type="org.apache.activemq.ActiveMQConnectionFactory"
+          description="JMS Connection Factory"
+          factory="org.apache.activemq.jndi.JNDIReferenceFactory"
+          brokerURL="tcp://localhost:81616" />
+
+<Resource name="jms/incomingQueues"
+          auth="Container"
+          type="org.apache.activemq.command.ActiveMQQueue"
+          factory="org.apache.activemq.jndi.JNDIReferenceFactory"
+          physicalName="IncomingQueues"/>
+
+<Resource name="jms/outgoingQueues"
+          auth="Container"
+          type="org.apache.activemq.command.ActiveMQQueue"
+          factory="org.apache.activemq.jndi.JNDIReferenceFactory"
+          physicalName="OutgoingQueues"/>
+
+</Context>

@@ -10,6 +10,10 @@
     <context:property-placeholder location="classpath:application-${ENV}.properties" order="1" ignore-unresolvable="true" ignore-resource-not-found="true"/>
     <context:property-placeholder location="classpath:application.properties" order="2" ignore-unresolvable="true" />
 
+
+    <import resource="classpath:datasource.xml" />
+    <!--<import resource="classpath:jms.xml" />-->
+
     <!-- Webservices section -->
     <import resource="classpath:META-INF/cxf/cxf.xml" />
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />

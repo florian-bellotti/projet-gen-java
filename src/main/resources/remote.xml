@@ -23,30 +23,6 @@
         </jaxrs:providers>
     </jaxrs:server>
 
-
-    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="${db.url}" />
-        <property name="username" value="${db.user}" />
-        <property name="password" value="${db.pwd}" />
-        <property name="initialSize" value="5" />
-        <property name="maxActive" value="200" />
-        <property name="maxIdle" value="5" />
-        <property name="minIdle" value="2" />
-        <property name="removeAbandoned" value="true"/>
-        <property name="removeAbandonedTimeout" value="45"/>
-        <property name="testOnBorrow" value="true"/>
-        <property name="validationQuery" value="SELECT 1"/>
-    </bean>
-
-    <bean id="dictionaryDao" class="com.fbellotti.gen.dao.DictionaryDao">
-        <constructor-arg name="dataSource" ref="dataSource" />
-    </bean>
-
-    <bean id="decodedFileDao" class="com.fbellotti.gen.dao.DecodedFileDao">
-        <constructor-arg name="dataSource" ref="dataSource" />
-    </bean>
-
     <bean id="dictionaryService" class="com.fbellotti.gen.remote.dictionary.DictionaryServiceImpl">
         <constructor-arg name="crudDao" ref="dictionaryDao" />
         <constructor-arg name="dictionaryDao" ref="dictionaryDao" />
@@ -54,5 +30,20 @@
 
     <bean id="decodedFileService" class="com.fbellotti.gen.remote.decodedFile.DecodedFileServiceImpl">
         <constructor-arg name="daoRef" ref="decodedFileDao" />
+    </bean>
+
+    <bean id="jmsProducer" class="com.fbellotti.gen.jms.JmsProducer">
+        <constructor-arg name="url" value="${jms.url}" />
+        <constructor-arg name="producerQueue" value="${jms.producerQueue}" />
+    </bean>
+
+    <bean id="jmsConsumer" class="com.fbellotti.gen.jms.JmsConsumer">
+        <constructor-arg name="url" value="${jms.url}" />
+        <constructor-arg name="listenerQueue" value="${jms.listenerQueue}" />
+        <constructor-arg name="listenerNb" value="${jms.listenerNb}" />
+        <constructor-arg name="daoDictionary" ref="dictionaryDao" />
+        <constructor-arg name="daoDecodedFile" ref="decodedFileDao" />
+        <constructor-arg name="minFiability" value="${jms.minFiability}" />
+        <constructor-arg name="jmsProducer" ref="jmsProducer" />
     </bean>
 </beans>

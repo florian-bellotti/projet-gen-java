@@ -194,4 +194,35 @@ public class DictionaryDao implements CrudDao<Word> {
       }
     }
   }
+
+  public List<String> findWords(List<String> words) {
+    String parameter = String.join("', '", words).toLowerCase();
+    String sql = "SELECT DISTINCT label FROM dictionary WHERE label IN ('"  + parameter + "')";
+    Connection conn = null;
+    words = new ArrayList<>();
+
+    try {
+      conn = dataSource.getConnection();
+
+      // prepare the query & execute
+      PreparedStatement ps = conn.prepareStatement(sql);
+      ResultSet rs = ps.executeQuery();
+      while (rs.next()) {
+        words.add(rs.getString("label"));
+      }
+      rs.close();
+      ps.close();
+      return words;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+  }
 }
