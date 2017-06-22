@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="http://fbellotti.com">Florian BELLOTTI</a>
@@ -210,6 +212,40 @@ public class DictionaryDao implements CrudDao<Word> {
       while (rs.next()) {
         words.add(rs.getString("label"));
       }
+      rs.close();
+      ps.close();
+      return words;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+  }
+
+  public Set<String> findAll() {
+    String sql = "SELECT * FROM dictionary";
+    Connection conn = null;
+    Set<String> words = new HashSet<>();
+
+    try {
+      conn = dataSource.getConnection();
+
+      // prepare the query & execute
+      PreparedStatement ps = conn.prepareStatement(sql);
+      ResultSet rs = ps.executeQuery();
+      //if (rs.next()) {
+        //words.add(rs.getString("label"));
+        while (rs.next()) {
+          words.add(rs.getString("label"));
+        }
+      //}
+
       rs.close();
       ps.close();
       return words;

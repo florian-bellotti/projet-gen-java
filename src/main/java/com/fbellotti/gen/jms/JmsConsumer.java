@@ -2,6 +2,7 @@ package com.fbellotti.gen.jms;
 
 import com.fbellotti.gen.dao.DecodedFileDao;
 import com.fbellotti.gen.dao.DictionaryDao;
+import com.fbellotti.gen.model.Words;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ public class JmsConsumer {
   // url should be
   @Autowired
   public JmsConsumer(String url, String listenerQueue, int listenerNb, DictionaryDao daoDictionary,
-                     DecodedFileDao daoDecodedFile, float minFiability, JmsProducer jmsProducer) {
+                     DecodedFileDao daoDecodedFile, float minFiability, JmsProducer jmsProducer, Words words) {
     ConnectionFactory factory = new ActiveMQConnectionFactory(url);
     try {
       Connection connection = factory.createConnection();
@@ -31,7 +32,7 @@ public class JmsConsumer {
       // init all listeners
       for (int i = 0;  i < listenerNb ; i++) {
         MessageConsumer consumer = session.createConsumer(queue);
-        DecodeListener listener = new DecodeListener(daoDictionary, daoDecodedFile, minFiability, jmsProducer);
+        DecodeListener listener = new DecodeListener(daoDictionary, daoDecodedFile, minFiability, jmsProducer, words);
         consumer.setMessageListener(listener);
       }
       LOG.info(listenerNb + " jms listeners created");

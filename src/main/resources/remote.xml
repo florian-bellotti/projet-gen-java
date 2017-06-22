@@ -26,10 +26,15 @@
     <bean id="dictionaryService" class="com.fbellotti.gen.remote.dictionary.DictionaryServiceImpl">
         <constructor-arg name="crudDao" ref="dictionaryDao" />
         <constructor-arg name="dictionaryDao" ref="dictionaryDao" />
+        <constructor-arg name="words" ref="words" />
     </bean>
 
     <bean id="decodedFileService" class="com.fbellotti.gen.remote.decodedFile.DecodedFileServiceImpl">
         <constructor-arg name="daoRef" ref="decodedFileDao" />
+    </bean>
+
+    <bean id="words" class="com.fbellotti.gen.model.Words" >
+        <constructor-arg name="daoDictionary" ref="dictionaryDao" />
     </bean>
 
     <bean id="jmsProducer" class="com.fbellotti.gen.jms.JmsProducer">
@@ -45,5 +50,6 @@
         <constructor-arg name="daoDecodedFile" ref="decodedFileDao" />
         <constructor-arg name="minFiability" value="${jms.minFiability}" />
         <constructor-arg name="jmsProducer" ref="jmsProducer" />
+        <constructor-arg name="words" ref="words" />
     </bean>
 </beans>
