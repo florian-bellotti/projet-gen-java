@@ -55,13 +55,13 @@ public class DictionaryDao implements CrudDao<Word> {
       // close connection
       ps.close();
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
@@ -93,16 +93,17 @@ public class DictionaryDao implements CrudDao<Word> {
       ps.close();
       return customer;
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
+    return null;
   }
 
   public void update(String id, Word word) {
@@ -121,13 +122,13 @@ public class DictionaryDao implements CrudDao<Word> {
       ps.executeUpdate();
       ps.close();
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
@@ -148,13 +149,13 @@ public class DictionaryDao implements CrudDao<Word> {
       ps.executeUpdate();
       ps.close();
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
@@ -185,16 +186,18 @@ public class DictionaryDao implements CrudDao<Word> {
       ps.close();
       return customers;
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
+
+    return null;
   }
 
   public List<String> findWords(List<String> words) {
@@ -216,16 +219,18 @@ public class DictionaryDao implements CrudDao<Word> {
       ps.close();
       return words;
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
+
+    return null;
   }
 
   public Set<String> findAll() {
@@ -250,15 +255,17 @@ public class DictionaryDao implements CrudDao<Word> {
       ps.close();
       return words;
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
+
+    return null;
   }
 }

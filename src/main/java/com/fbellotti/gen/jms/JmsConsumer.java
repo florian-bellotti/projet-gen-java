@@ -1,7 +1,6 @@
 package com.fbellotti.gen.jms;
 
 import com.fbellotti.gen.dao.DecodedFileDao;
-import com.fbellotti.gen.dao.DictionaryDao;
 import com.fbellotti.gen.model.Words;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
@@ -19,7 +18,6 @@ public class JmsConsumer {
 
   private static final Logger LOG = LoggerFactory.getLogger(JmsConsumer.class);
 
-  // url should be
   @Autowired
   public JmsConsumer(String url, String listenerQueue, int listenerNb,
                      DecodedFileDao daoDecodedFile, float minFiability,

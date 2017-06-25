@@ -4,6 +4,7 @@ import com.fbellotti.gen.dao.DictionaryDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 

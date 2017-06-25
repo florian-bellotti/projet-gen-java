@@ -24,9 +24,10 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
     this.dataSource = dataSource;
   }
 
-  public void create(DecodedFile decodedFile) {
+  public void create(DecodedFile decodedFile){
     Connection conn = null;
     String query = "INSERT INTO decodedFile (fileName, decodeKey, md5, firstWord, secret) VALUES (?,?,?,?,?)";
+
 
     try {
       conn = dataSource.getConnection();
@@ -43,20 +44,19 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
       ps.executeUpdate();
       ps.close();
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
   }
-
-  @Override
-  public DaoResponse<DecodedFile> find(MultivaluedMap<String, String> multivaluedMap) {
+  
+  public DaoResponse<DecodedFile> find(MultivaluedMap<String, String> multivaluedMap){
     String query = createQuery(multivaluedMap, false);
     Connection conn = null;
     List<DecodedFile> decodedFiles = new ArrayList<>();
@@ -105,20 +105,22 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
       ps.close();
       return new DaoResponse<>(decodedFiles, 0, decodedFiles.size(), decodedFiles.size(), 1000);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
+
+    return null;
   }
 
   @Override
-  public long count(MultivaluedMap<String, String> multivaluedMap) {
+  public long count(MultivaluedMap<String, String> multivaluedMap){
     String query = createQuery(multivaluedMap, true);
     Connection conn = null;
     int total = 0;
@@ -136,22 +138,59 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
       ps.close();
       return (long) total;
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     } finally {
       if (conn != null) {
         try {
           conn.close();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          e.printStackTrace();
         }
       }
     }
 
+    return 0;
   }
 
   @Override
   public DaoResponse<DecodedFile> first(MultivaluedMap<String, String> multivaluedMap) {
     return null;
+  }
+
+  public Boolean isAlreadyExist(String fileName, String firstWord){
+    String sql =
+      "SELECT distinct fileName, firstWord FROM decodedFile " +
+      "WHERE fileName = ? AND firstWord = ?";
+    Connection conn = null;
+
+    try {
+      conn = dataSource.getConnection();
+
+      // prepare the query & execute
+      PreparedStatement ps = conn.prepareStatement(sql);
+      ps.setString(1, fileName);
+      ps.setString(2, firstWord);
+      ResultSet rs = ps.executeQuery();
+      Boolean exist = rs.next();
+
+      // close
+      rs.close();
+      ps.close();
+
+      return exist;
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+
+    return false;
   }
 
   private String createQuery(MultivaluedMap<String, String> filters, Boolean count) {
@@ -190,38 +229,4 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
     return "SELECT " + fields + " FROM decodedFile " + where + orderBy;
   }
 
-  public Boolean isAlreadyExist(String fileName, String firstWord) {
-    String sql =
-      "SELECT distinct fileName, firstWord FROM decodedFile " +
-      "WHERE fileName = ? AND firstWord = ?";
-    Connection conn = null;
-    Boolean exist = false;
-
-    try {
-      conn = dataSource.getConnection();
-
-      // prepare the query & execute
-      PreparedStatement ps = conn.prepareStatement(sql);
-      ps.setString(1, fileName);
-      ps.setString(2, firstWord);
-      ResultSet rs = ps.executeQuery();
-      exist = (rs.next()) ? true : false;
-
-      // close
-      rs.close();
-      ps.close();
-
-      return exist;
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (conn != null) {
-        try {
-          conn.close();
-        } catch (SQLException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-  }
 }
