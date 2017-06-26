@@ -10,9 +10,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +25,8 @@ public class DecodeListener implements MessageListener {
   private float minFiability;
   private JmsProducer jmsProducer;
   private Words words;
+  private Map<String, Integer> maxLoopByFileName;
+
 
   public DecodeListener(DecodedFileDao daoDecodedFile, float minFiability,
                         JmsProducer jmsProducer, Words words) {
@@ -35,6 +35,7 @@ public class DecodeListener implements MessageListener {
     this.minFiability = minFiability;
     this.jmsProducer = jmsProducer;
     this.words = words;
+    this.maxLoopByFileName = new HashMap<>();
   }
 
   @Override
@@ -47,12 +48,20 @@ public class DecodeListener implements MessageListener {
       String key = msg.getStringProperty("key");
       String fileName = msg.getStringProperty("fileName");
       String md5 = msg.getStringProperty("md5");
+      int maxLoop = msg.getIntProperty("maxLoop");
       int contains = 0;
 
-      if (key == null || fileName == null || md5 == null) {
-        LOG.error("key, fileName or md5 are null");
+      if (key == null || fileName == null || md5 == null || maxLoop == 0) {
+        LOG.error("key, fileName, md5 or maxLoop are null");
         return;
       }
+
+      if (maxLoopByFileName.get(fileName) == null) {
+        maxLoopByFileName.put(fileName, 0);
+      }
+
+      int count = maxLoopByFileName.get(fileName);
+      maxLoopByFileName.put(fileName, count + 1);
 
       String[] wordsTab = textMessage.getText().split(" ");
       System.out.print(words.getWords().size());
@@ -84,10 +93,17 @@ public class DecodeListener implements MessageListener {
 
         if (!daoDecodedFile.isAlreadyExist(fileName, wordsTab[0])) {
           LOG.info("File " + fileName + " was decoded with key " + key);
-          jmsProducer.produce(key, fileName, key, secret);
           daoDecodedFile.create(decodedFile);
         }
+        System.out.println("Send " + fileName );
+        jmsProducer.produce(key, fileName, key, secret);
       }
+
+      if (count == maxLoop) {
+        System.out.println("send null");
+        jmsProducer.produce("", fileName, "", "");
+      }
+
       System.out.println(Thread.currentThread().getName() + " ratio : " + ratio);
     } catch (JMSException e) {
       e.printStackTrace();
