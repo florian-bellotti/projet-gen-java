@@ -105,7 +105,7 @@ public class DictionaryServiceImpl extends CrudServiceImpl<Word> implements Dict
       try {
         this.dictionaryDao.delete(id);
         words.setWords(this.dictionaryDao.findAll());
-        return Response.status(204).build();
+        return Response.status(204).header("Access-Control-Allow-Origin", "*").build();
       } catch (Exception var5) {
         return Response.status(500).entity(this.executionError).build();
       }

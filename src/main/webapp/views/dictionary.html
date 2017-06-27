@@ -1,0 +1,43 @@
+<div class="header-settings">
+  <div class="row">
+    <p class="h1-settings col-xs-12">Projet Gen</p>
+  </div>
+  <ul class="nav nav-tabs nav-tabs-settings">
+    <li role="presentation"class="active"><a href="#/dictionary">Dictionnaire</a></li>
+    <li role="presentation"><a href="#/decodedFiles">Fichiers décodés</a></li>
+  </ul>
+</div>
+
+<div class="content-settings row">
+  <div class="col-xs-offset-2 col-xs-8">
+    <h2 class="h2-settings">Mots</h2>
+
+    <form class="form-inline col-xs-12" style="margin-bottom: 20px">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Mot ..." ng-model="word" style="margin-right : 10px;">
+      </div>
+      <button type="submit" class="btn btn-default" ng-click="research(word)">Rechercher</button>
+      <button class="btn btn-default" ng-click="add(word)">Ajouter</button>
+    </form>
+
+    <p style="color: red;">{{message}}</p>
+
+    <img ng-show="load" src="ajax-loader.gif" alt="loader">
+
+    <div class="table" ng-show="words">
+      <table class="table table-hover table-responsive">
+        <tr>
+          <th>Id</th>
+          <th>Label</th>
+          <th>Actions</th>
+        </tr>
+        <tr ng-repeat="word in words">
+          <td>{{ word.id }}</td>
+          <td>{{ word.label }}</td>
+          <td><button class="btn btn-danger" ng-click="delete(word.id)">Supprimer</button></td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+</div>
