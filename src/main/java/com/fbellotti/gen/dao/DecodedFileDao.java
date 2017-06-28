@@ -3,6 +3,8 @@ package com.fbellotti.gen.dao;
 import com.fbellotti.api_ws_spring.dao.QueryStringDao;
 import com.fbellotti.api_ws_spring.model.DaoResponse;
 import com.fbellotti.gen.model.DecodedFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,7 @@ import java.util.*;
 @Component
 public class DecodedFileDao implements QueryStringDao<DecodedFile> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DecodedFileDao.class);
   private DataSource dataSource;
 
   @Autowired
@@ -24,15 +27,17 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
     this.dataSource = dataSource;
   }
 
+  /**
+   * Add a decoded file in the database
+   * @param decodedFile The decoded file to create in database
+   */
   public void create(DecodedFile decodedFile){
     Connection conn = null;
     String query = "INSERT INTO decodedFile (fileName, decodeKey, md5, firstWord, secret) VALUES (?,?,?,?,?)";
 
-
     try {
+      // create connection and prepare the query
       conn = dataSource.getConnection();
-
-      // prepare the query
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
       ps.setString(1, decodedFile.getFileName());
       ps.setString(2, decodedFile.getDecodeKey());
@@ -40,22 +45,22 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
       ps.setString(4, decodedFile.getFirstWorld());
       ps.setString(5, decodedFile.getSecret());
 
-      // execute the query
+      // execute the query and close connection
       ps.executeUpdate();
+      LOG.info("DecodedFile added : " + decodedFile.toString());
       ps.close();
     } catch (SQLException e) {
-      e.printStackTrace();
+      LOG.error("Error when try to add decodedFile : " + decodedFile.toString() + e);
     } finally {
-      if (conn != null) {
-        try {
-          conn.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
+      closeConnection(conn);
     }
   }
-  
+
+  /**
+   * Find all decoded files
+   * @param multivaluedMap It's a MultivaluedMap that contains an list of filters (asc, fields...)
+   * @return Return an object DaoResponse<DecodedFile>
+   */
   public DaoResponse<DecodedFile> find(MultivaluedMap<String, String> multivaluedMap){
     String query = createQuery(multivaluedMap, false);
     Connection conn = null;
@@ -63,10 +68,11 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
     Set<String> fields = (multivaluedMap.get("fields") == null) ? null : new HashSet<>(multivaluedMap.get("fields"));
 
     try {
+      // create connection and prepare the query
       conn = dataSource.getConnection();
       PreparedStatement ps = conn.prepareStatement(query);
 
-      // execute query
+      // execute query and close connection
       ResultSet rs = ps.executeQuery();
       while (rs.next()) {
         if (fields != null) {
@@ -105,20 +111,19 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
       ps.close();
       return new DaoResponse<>(decodedFiles, 0, decodedFiles.size(), decodedFiles.size(), 1000);
     } catch (SQLException e) {
-      e.printStackTrace();
+      LOG.error("Error when try to find decodedFiles" + e);
     } finally {
-      if (conn != null) {
-        try {
-          conn.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
+      closeConnection(conn);
     }
 
     return null;
   }
 
+  /**
+   * Count the number of decoded files
+   * @param multivaluedMap It's a MultivaluedMap that contains an list of filters (asc, fields...)
+   * @return Return a long that contains the count of decoded files
+   */
   @Override
   public long count(MultivaluedMap<String, String> multivaluedMap){
     String query = createQuery(multivaluedMap, true);
@@ -126,6 +131,7 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
     int total = 0;
 
     try {
+      // create connection and prepare query
       conn = dataSource.getConnection();
       PreparedStatement ps = conn.prepareStatement(query);
 
@@ -134,65 +140,71 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
       if (rs.next()) {
         total = rs.getInt("total");
       }
+
+      // close connections
       rs.close();
       ps.close();
       return (long) total;
     } catch (SQLException e) {
-      e.printStackTrace();
+      LOG.error("Error when try to count decodedFiles" + e);
     } finally {
-      if (conn != null) {
-        try {
-          conn.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
+      closeConnection(conn);
     }
 
     return 0;
   }
 
+  /**
+   * This method is not implemented
+   */
   @Override
   public DaoResponse<DecodedFile> first(MultivaluedMap<String, String> multivaluedMap) {
     return null;
   }
 
-  public Boolean isAlreadyExist(String fileName, String firstWord){
+  /**
+   * This method say if a decoded file exist in the database
+   * @param fileName The file name of the decoded file
+   * @param md5 The md5 of the decoded file
+   * @return Return true is the file exist in the database
+   */
+  public Boolean isAlreadyExist(String fileName, String md5){
     String sql =
       "SELECT distinct fileName, firstWord FROM decodedFile " +
-      "WHERE fileName = ? AND firstWord = ?";
+      "WHERE fileName = ? AND md5 = ?";
     Connection conn = null;
 
     try {
+      // create the connection
       conn = dataSource.getConnection();
 
       // prepare the query & execute
       PreparedStatement ps = conn.prepareStatement(sql);
       ps.setString(1, fileName);
-      ps.setString(2, firstWord);
+      ps.setString(2, md5);
       ResultSet rs = ps.executeQuery();
       Boolean exist = rs.next();
 
       // close
       rs.close();
       ps.close();
-
       return exist;
     } catch (SQLException e) {
-      e.printStackTrace();
+      LOG.error("Error when try to say if file " + fileName  + " and md5 " + md5 + " exist in the database");
     } finally {
-      if (conn != null) {
-        try {
-          conn.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
+      closeConnection(conn);
     }
 
     return false;
   }
 
+  /**
+   * This method allow to create a query to find decoded files
+   * in the database. There is some filters (ex : range, fields)
+   * @param filters The filters
+   * @param count True if the query is a count and not a basic select
+   * @return Return the query in a String
+   */
   private String createQuery(MultivaluedMap<String, String> filters, Boolean count) {
     String where = "";
     String fields = "";
@@ -229,4 +241,17 @@ public class DecodedFileDao implements QueryStringDao<DecodedFile> {
     return "SELECT " + fields + " FROM decodedFile " + where + orderBy;
   }
 
+  /**
+   * This method allow to close the database's connection
+   * @param conn The connection to close
+   */
+  private void closeConnection(Connection conn) {
+    if (conn != null) {
+      try {
+        conn.close();
+      } catch (SQLException e) {
+        LOG.error("Error when try to close database connection" + e);
+      }
+    }
+  }
 }

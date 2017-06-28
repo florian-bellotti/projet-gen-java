@@ -31,12 +31,21 @@ public class JmsProducer {
     }
   }
 
-  public void produce(String message, String fileName, String key, String secret) {
+  /**
+   * This method allow to send a message in ActiveMQ
+   * @param message The message to send
+   * @param fileName The fileName to send
+   * @param key The key to send
+   * @param secret The secret to send
+   * @param ratio The ratio to send
+   */
+  void produce(String message, String fileName, String key, String secret, float ratio) {
     try {
       TextMessage msg = session.createTextMessage();
       msg.setStringProperty("fileName", fileName);
       msg.setStringProperty("key", key);
       msg.setStringProperty("secret", secret);
+      msg.setFloatProperty("ratio", ratio);
       msg.setText(message);
       producer.send(msg);
     } catch (JMSException e) {

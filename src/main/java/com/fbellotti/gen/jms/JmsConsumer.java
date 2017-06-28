@@ -20,7 +20,7 @@ public class JmsConsumer {
 
   @Autowired
   public JmsConsumer(String url, String listenerQueue, int listenerNb,
-                     DecodedFileDao daoDecodedFile, float minFiability,
+                     DecodedFileDao daoDecodedFile, float minReliability,
                      JmsProducer jmsProducer, Words words) {
     ConnectionFactory factory = new ActiveMQConnectionFactory(url);
     try {
@@ -31,7 +31,7 @@ public class JmsConsumer {
       // init all listeners
       for (int i = 0;  i < listenerNb ; i++) {
         MessageConsumer consumer = session.createConsumer(queue);
-        DecodeListener listener = new DecodeListener(daoDecodedFile, minFiability, jmsProducer, words);
+        DecodeListener listener = new DecodeListener(daoDecodedFile, minReliability, jmsProducer, words);
         consumer.setMessageListener(listener);
       }
       LOG.info(listenerNb + " jms listeners created");

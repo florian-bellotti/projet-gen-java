@@ -47,7 +47,7 @@
         <constructor-arg name="listenerQueue" value="${jms.listenerQueue}" />
         <constructor-arg name="listenerNb" value="${jms.listenerNb}" />
         <constructor-arg name="daoDecodedFile" ref="decodedFileDao" />
-        <constructor-arg name="minFiability" value="${jms.minFiability}" />
+        <constructor-arg name="minReliability" value="${jms.minReliability}" />
         <constructor-arg name="jmsProducer" ref="jmsProducer" />
         <constructor-arg name="words" ref="words" />
     </bean>

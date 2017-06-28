@@ -78,4 +78,10 @@ public class DecodedFile {
   public void setSecret(String secret) {
     this.secret = secret;
   }
+
+  public String toString() {
+    return "DecodedFile[id=" + id + ", fileName=" + fileName +
+      ", decodeKey=" + decodeKey + ", md5=" + md5 +
+      ", firstWord=" + firstWord + ", secret=" + secret + "]";
+  }
 }

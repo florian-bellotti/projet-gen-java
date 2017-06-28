@@ -38,4 +38,8 @@ public class Word {
   public void setLabel(String label) {
     this.label = label;
   }
+
+  public String toString() {
+    return "Word[id=" + id + ", label=" + label + "]";
+  }
 }
